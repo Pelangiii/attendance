@@ -31,4 +31,30 @@ class AuthServices {
       rethrow;
     }
   }
+
+  //register w email and password
+  Future<UserCredential> registerWithEmailAndPassword(String email, String password) async{
+    try {
+      return await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password
+      );
+    } catch (e) {
+      if (e is FirebaseAuthException) {
+        if (e.code == 'opration-not-allowed') {
+          throw 'email or password sign up is not enabled, Please enabled on firebase console';
+        }
+      }
+      rethrow;
+    }
+  }
+
+  //sign out
+  Future<void> signOut() async {
+    try {
+      await _auth.signOut();
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
