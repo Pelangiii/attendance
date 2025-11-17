@@ -19,7 +19,7 @@ class AuthTextField extends StatelessWidget {
       obscureText: obscureText,
       decoration: InputDecoration(
         labelText: lable,
-        prefixIcon: Icon(icon, color: Colors.blue[600],),
+        prefixIcon: Icon(icon, color: const Color.fromARGB(255, 30, 136, 229),),
         suffixIcon: suffixIcon,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
