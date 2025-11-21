@@ -1,4 +1,7 @@
 import 'package:attendance_app/models/attendance_record.dart';
+import 'package:attendance_app/screens/home/widgets/action_button.dart';
+import 'package:attendance_app/screens/home/widgets/attendance_card.dart';
+import 'package:attendance_app/screens/home/widgets/profile_card.dart';
 import 'package:attendance_app/services/auth_services.dart';
 import 'package:attendance_app/services/firestore_services.dart';
 import 'package:attendance_app/services/storage_services.dart';
@@ -161,9 +164,49 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         actions: [
           IconButton(
-            
+            icon: Icon(Icons.history),
+            onPressed: () {
+              //TODO: history
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () async => await _authServices.signOut(),
           )
         ],
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: AlignmentGeometry.topCenter,
+            end: AlignmentGeometry.bottomCenter,
+            colors: [
+              Colors.blue[700]!,
+              Colors.grey[50]!
+            ],
+            stops: [0, 0, 0.3]
+          )
+        ),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ProfileCard(),
+              SizedBox(height: 24),
+              AttendanceCard(todayRecord: _todayRecord),
+              SizedBox(height: 24),
+              ActionButton(
+                todayRecord: _todayRecord,
+                isLoading: _isLoading,
+                onCheckIn: () => _CheckIn(),
+                onCheckOut: () => _checkOut(),
+                onCheckInWithPhoto: (path) => _CheckIn(photoPath: path),
+                onCheckOutWithPhoto: (path) => _checkOut(photoPath: path),
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
