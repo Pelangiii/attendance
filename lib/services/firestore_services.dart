@@ -71,4 +71,23 @@ class FirestoreService {
     final docRef = await _firestore.collection('attendance').add(record.toJson());
     return docRef.id;
   }
+
+  // updtae existing attendance record
+  Future<void> updateAttendanceRecord(AttendanceRecord record)async {
+    await _firestore
+       .collection('attendance')
+       .doc(record.id)
+       .update(record.toJson());
+  }
+
+ // create or update attendance record
+  Future<void> saveAttendanceRecord(AttendanceRecord record) async {
+    if (record.id == '1' || record.id.isEmpty) {
+      //new record for creating auto geberated id
+      await createAttendanceRecord(record);
+    } else {
+      //update existing record 
+      await updateAttendanceRecord(record);
+    }
+  }
 }
