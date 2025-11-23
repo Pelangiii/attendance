@@ -24,17 +24,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    // trim supaya tidak ada spasi
     try {
       await _authService.signInWithEmailAndPassword(
         _emailController.text.trim(),
         _passwordController.text.trim()
       );
     } catch (e) {
-      if (mounted) { 
-        //kalo error
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("an error occured, please try again later"), backgroundColor: Colors.red)
+          SnackBar(
+            content: Text("an error occured, please try again later"),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
@@ -58,9 +59,27 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+
+          // ⭐ Tambahan "Continue to Login"
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: Text(
+                "Continue to Login",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+
           Card(
             elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: Padding(
               padding: EdgeInsets.all(24.0),
               child: Form(
@@ -74,23 +93,30 @@ class _LoginScreenState extends State<LoginScreen> {
                       obscureText: false,
                       icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
-                      validator: (value) => value?.isEmpty ?? true ? 'Please enter your email' : null,
+                      validator: (value) => value?.isEmpty ?? true
+                          ? 'Please enter your email'
+                          : null,
                     ),
                     SizedBox(height: 16),
                     AuthTextField(
                       controller: _passwordController,
                       lable: 'Password',
-                      icon:  Icons.lock_outline,
+                      icon: Icons.lock_outline,
                       obscureText: _obscurePassword,
-                      // untuk visibility password
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                          _obscurePassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
                           color: Colors.blue[600],
                         ),
-                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword ),
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
                       ),
-                      validator: (value) => value?.isEmpty ?? true ? 'Please enter password' : null,
+                      validator: (value) => value?.isEmpty ?? true
+                          ? 'Please enter password'
+                          : null,
                     ),
                     SizedBox(height: 24),
                     ElevatedButton(
@@ -99,43 +125,50 @@ class _LoginScreenState extends State<LoginScreen> {
                         backgroundColor: Colors.blue[700],
                         foregroundColor: Colors.white,
                         padding: EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 4
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 4,
                       ),
                       child: _isLoading
                           ? SizedBox(
                               height: 20,
                               width: 20,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                          )
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
                           : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.login_rounded, size: 20,),
-                              SizedBox(width: 8,),
-                              Text(
-                                'Login',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.login_rounded, size: 20),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              )
-                            ],
-                          )
+                              ],
+                            ),
                     ),
                   ],
                 ),
               ),
             ),
           ),
-          SizedBox(height: 24,),
+
+          SizedBox(height: 24),
+
           TextButton(
             onPressed: widget.onRegisterTap,
             style: TextButton.styleFrom(
-              foregroundColor: Colors.white
+              foregroundColor: Colors.white,
             ),
             child: Text("Don't Have An Account? Register"),
-          )
+          ),
         ],
       ),
     );

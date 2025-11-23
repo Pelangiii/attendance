@@ -34,7 +34,7 @@ class AttendanceApp extends StatelessWidget {
           elevation: 0,
         )
       ),
-      home: AuthWrapper(),
+      home: AuthWrapper() ,
     );
   }
 }

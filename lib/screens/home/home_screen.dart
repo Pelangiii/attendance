@@ -1,8 +1,10 @@
 import 'package:attendance_app/models/attendance_record.dart';
+import 'package:attendance_app/screens/history/history_screen.dart';
 import 'package:attendance_app/screens/home/widgets/action_button.dart';
 import 'package:attendance_app/screens/home/widgets/attendance_card.dart';
 import 'package:attendance_app/screens/home/widgets/profile_card.dart';
 import 'package:attendance_app/services/auth_services.dart';
+
 import 'package:attendance_app/services/firestore_services.dart';
 import 'package:attendance_app/services/storage_services.dart';
 import 'package:flutter/material.dart';
@@ -27,33 +29,26 @@ class _HomeScreenState extends State<HomeScreen> {
     _listenToTodayRecord();
   }
 
-  // mendengarkan semua hal yg terjadi di homescreen ->attendance record
   void _listenToTodayRecord() {
-    final user = _authServices.currentUser;
+    final 
+    user = _authServices.currentUser;
     if (user != null) {
-      _firestoreService.getTodayRecordStream(user.uid).listen((record) {
-        // masih aktif
-        if (mounted) setState(() => _todayRecord = record);
+      _firestoreService.getTodayRecordStream(user.uid).listen((record){
+        if (mounted) setState(() => _todayRecord =  record);
       });
     }
   }
 
-  // utk check in
-  Future<void> _CheckIn({String? photoPath}) async {
+  Future<void> _checkIn({String? photoPath}) async {
     final user = _authServices.currentUser;
-    // kalo user tidak ada di database
-    if (user == null) return null;
+    if (user == null) return;
 
     setState(() => _isLoading = true);
 
-    // percobaan utk take photo ketika check in
     try {
       String? photoKey;
       if (photoPath != null) {
-        photoKey = await _storageServices.uploadAttendancePhoto(
-          photoPath,
-          'CheckIn',
-        );
+        photoKey = await _storageServices.uploadAttendancePhoto(photoPath, 'checkin');
       }
 
       final now = DateTime.now();
@@ -62,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
         userId: user.uid,
         checkInTime: now,
         date: DateTime(now.year, now.month, now.day),
-        checkInPhotoPath: photoKey,
+        checkInPhotoPath: photoKey
       );
 
       await _firestoreService.createAttendanceRecord(record);
@@ -71,23 +66,20 @@ class _HomeScreenState extends State<HomeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              photoPath != null
-                  ? 'Check in successfully with photo!'
-                  : 'Check in successfully',
+              photoPath != null ? 'Check in successfully with photo!' : 'Check in successfully',
             ),
             backgroundColor: Colors.green,
             duration: Duration(seconds: 2),
-          ),
+          )
         );
       }
     } catch (e) {
-      // kalau tidak berhasil check in
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error checkhing in: ${e.toString()}'),
+            content: Text('Errod checking in: ${e.toString()}'),
             backgroundColor: Colors.red,
-          ),
+          )
         );
       }
     } finally {
@@ -95,59 +87,56 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // check out
   Future<void> _checkOut({String? photoPath}) async {
     if (_todayRecord == null) return;
 
-    setState(() => _isLoading = true);
+    setState(() => _isLoading =true);
 
     try {
       String? photoKey;
       if (photoPath != null) {
-        photoKey = await _storageServices.uploadAttendancePhoto(
-          photoPath,
-          'checkout',
+        photoKey = await _storageServices.uploadAttendancePhoto(photoPath, 'checkout');}
+
+        final updateRecord = AttendanceRecord(
+          id: _todayRecord!.id,
+          userId: _todayRecord!.userId,
+          checkInTime: _todayRecord!.checkInTime,
+          checkOutTime: DateTime.now(),
+          date: _todayRecord!.date,
+          checkInPhotoPath: _todayRecord!.checkInPhotoPath,
+          checkOutPhotoPath: photoKey
         );
-      }
 
-      final updateRecord = AttendanceRecord(
-        id: _todayRecord!.id,
-        userId: _todayRecord!.userId,
-        checkInTime: _todayRecord!.checkInTime,
-        checkOutTime: DateTime.now(),
-        date: _todayRecord!.date,
-        checkInPhotoPath: _todayRecord!.checkInPhotoPath,
-        checkOutPhotoPath: photoKey,
-      );
+        await _firestoreService.updateAttendaceRecord(updateRecord);
 
-      await _firestoreService.updateAttendanceRecord(updateRecord);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              photoPath != null
-                  ? 'Checked Out successfully with photo'
-                  : 'Check Out succesfully',
-            ),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                photoPath != null 
+                ? 'Checked out successfully with photo' 
+                : 'Checked out successfully'
+              ),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            )
+          );
+        }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:Text(
-              'Error cheking out: ${e.toString()}',
+            content: Text(
+              'Error checking out: ${e.toString()}'
             ),
             backgroundColor: Colors.red,
           )
         );
       }
     } finally {
-      if (mounted) setState(() => _isLoading = false); 
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -156,18 +145,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text(
-          'Attendance Tracker'
-        ),
+        title: Text('Attendance Tracker'),
         backgroundColor: Colors.blue[700],
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
           IconButton(
             icon: Icon(Icons.history),
-            onPressed: () {
-              //TODO: history
-            },
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => HistoryScreen())
+            )
           ),
           IconButton(
             icon: Icon(Icons.logout),
@@ -178,13 +165,13 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: AlignmentGeometry.topCenter,
-            end: AlignmentGeometry.bottomCenter,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [
               Colors.blue[700]!,
               Colors.grey[50]!
             ],
-            stops: [0, 0, 0.3]
+            stops: [0.0, 0.3]
           )
         ),
         child: SingleChildScrollView(
@@ -199,9 +186,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ActionButton(
                 todayRecord: _todayRecord,
                 isLoading: _isLoading,
-                onCheckIn: () => _CheckIn(),
+                onCheckIn: () => _checkIn(),
                 onCheckOut: () => _checkOut(),
-                onCheckInWithPhoto: (path) => _CheckIn(photoPath: path),
+                onCheckInWithPhoto: (path) => _checkIn(photoPath: path),
                 onCheckOutWithPhoto: (path) => _checkOut(photoPath: path),
               )
             ],

@@ -10,7 +10,7 @@ class StorageServices {
   final DatabaseReference _database = FirebaseDatabase.instanceFor(
     app: FirebaseDatabase.instance.app,
     databaseURL:
-        'https://attendance-app-364b0-default-rtdb.asia-southeast1.firebasedatabase.app/',
+        'https://attendance-app-c4d78-default-rtdb.asia-southeast1.firebasedatabase.app/',
   ).ref();
 
   // upload photo to firebase realtime database as base64 (string)

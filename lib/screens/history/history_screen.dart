@@ -34,7 +34,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         
       ),
       body: StreamBuilder<List<AttendanceRecord>>(
-        stream: _firestoreService.getAttendanceRecords(user.uid),
+        stream: _firestoreService.getAttendanceRecord(user.uid),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
